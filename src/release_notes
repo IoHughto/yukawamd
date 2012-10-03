@@ -1,0 +1,28 @@
+Here are issues to be addressed:
+
+A. Pressure tensor calculation
+
+B. Uniform magnetic field along the z-direction
+
+C. Oscillating electric field, for linear response.
+
+D. 1) Replace nested DO loops over ngroup, ntot and nind, with a single
+      DO loop over timesteps. The statistical calculations of potential
+      energy and pressure that have been done at the end of every loop
+      over nind microsteps, and at the end of every ntot sets of micro
+      steps, will now be controlled by modulo calculations.
+   2) Should warmup steps be done the same way?
+
+E. Decide what to do about calculating g(r) and S(q). Do we keep those
+   calculations in the MD code itself? or relegate them to post proces-
+   sing?
+
+F. Do true checkpointing, so one can actually restart a job from where
+   it crashed or was halted.
+
+G. Update the random number functions to F95 syntax. Do away with
+   common blocks.
+
+H. 1) Remember to update version date in all source files.
+   2) Take Chuck's name off the author list (so he won't be blamed for my
+      mistakes).

@@ -1,0 +1,16 @@
+# Include file for Intel compilers
+
+ TARCH      = 
+
+ F95        = ifort
+#FPPFLAGS   =
+ F95FLAGS   = -free -convert big_endian -assume nounderscore -nomixed_str_len_arg
+ F95OPT     = -g
+ F95OMP     = ifort -openmp
+ MPF95      = mpif90
+#MPF95      = mpif90 -I/N/soft/linux-rhel3_AS-ia32/mpich-gm-1.2.6..14a-intel-r1/include/
+ MPOMPF95   = mpif90 -openmp
+ CC         = icc
+ COPT       = -O
+
+ DMDGRAPE   = -DMDGRAPE

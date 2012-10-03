@@ -1,0 +1,15 @@
+!
+!  MD 6.0.7
+!  ----------
+!  2009-Jan-12 (Don Berry) -- Release with fixes to make nucleon-nucleon inter-
+!         actions work, and to make MPI version work.
+
+   2009-May-04 (DKB) In main program, moved incrementing of istep from before calls to
+      subtract_vcom, tnorm and newton to after. One effect is istep now counts how
+      many steps have been completed, rather than counting the step currently being
+      calculated. However, the main reason for this change is so tnorm can be done at
+      the same point as in old versions of the code. In older versions, tnorm was done
+      at the beginning of a measurement group (at the beginning of the "do ngroup"
+      loop). In version 6.0.6, however, tnorm would be done at the end of a group
+      if tnormalize=ntot*nind. This alters measurement statistics in a way one 
+      probably does not want.

@@ -1,0 +1,21 @@
+# Include file for Portland Group compilers on mdgrapexx.uits.iu.edu machines.
+# Also, some special settings for these machines.
+
+ TARCH      = 
+
+ F95        = pgf95
+#F95FLAGS   = -Mfree -Mbyteswapio
+ F95FLAGS   = -Mfree -Mbyteswapio -Msecond_underscore
+ F95OPT     = -O
+#F95OPT     = -g
+ OMPF95     = pgf95 -mp
+ MPF95      = mpif90
+#MPF95      = mpif90 -I/N/soft/linux-rhel4_AS-x86_64/mpichgm-1.2.6..14b-pgi/include/
+ MPOMPF95   = mpif90 -mp
+ CC         = pgcc
+ COPT       = -O
+
+ M2_INC_PATH  = /usr/local/lib/m2
+ M2_LIB_PATH  = /usr/local/lib
+
+ DMDGRAPE   = -DMDGRAPE

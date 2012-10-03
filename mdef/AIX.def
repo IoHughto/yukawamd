@@ -1,0 +1,47 @@
+# Include file for AIX compilers
+
+#TARCH      = -q32 -qarch=auto -qtune=auto -qcache=auto  #AIX
+#TARCH      = -q64 -qarch=auto -qtune=auto -qcache=auto  #AIX
+ TARCH      =
+
+# Fortran 77 compiler
+#F77        = f77
+ F77        = xlf -qfixed
+ FPPFLAGS   =
+ F77FLAGS   = -qextname
+ F77OPT     = -O
+#F77OPT     = -g
+
+# Fortran 90 compiler
+ F90        = xlf90
+ MPF90      = mpxlf90
+ FPPFLAGS   =
+#F90FLAGS   = -qextname -qsource
+ F90FLAGS   = -qextname -qmaxmem=8192
+ F90OPT     = -O
+#F90OPT     = -g
+#OMPF90     = mpxlf90_r -qsmp=noopt,omp
+#OMPF90     = xlf90_r -qsmp=noopt,omp
+ OMPF90     = xlf90_r -qsmp=omp
+ MPOMPF90   = mpxlf90_r -qsmp=omp
+
+# Fortran 95 compiler
+ F95        = xlf95
+ MPF95      = mpxlf95
+ FPPFLAGS   =
+#F95FLAGS   = -qextname -qsource
+ F95FLAGS   = -qextname -qmaxmem=8192
+ F95OPT     = -O
+#F95OPT     = -g
+#OMPF95     = mpxlf95_r -qsmp=noopt,omp
+#OMPF95     = xlf95_r -qsmp=noopt,omp
+ OMPF95     = xlf95_r -qsmp=omp
+ MPOMPF95   = mpxlf95_r -qsmp=omp
+
+# C compiler
+ CC         = xlc
+ OMPCC      = xlc_r
+ COPT       = -O
+
+
+ DMDGRAPE   = -WF,-DMDGRAPE

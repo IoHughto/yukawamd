@@ -11,9 +11,9 @@
 #MDEF       = AIX
 #MDEF       = INTEL
 #MDEF       = PGI
-#MDEF       = BigRed
+ MDEF       = BigRed
 #MDEF       = Quarry
- MDEF       = Ubuntu
+#MDEF       = Ubuntu #Never really got this one to work
 
  include ../mdef/$(MDEF).def
 

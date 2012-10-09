@@ -1,9 +1,9 @@
 !*******************************************************************************
-!    MD 6.2.0
+!    MD 6.3.0
 ! ---------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
-!    Authors:           Don Berry
-!    Last modified by:  Don Berry, 2012-May-18
+!    Authors:           Don Berry, Joe Hughto
+!    Last modified by:  Joe Hughto, 2012-Oct-09
 ! ---------------------------------------------------------------------
 !
 ! Initconfig sets the charge, mass, and initial position and velocity for all
@@ -164,6 +164,7 @@
         !xl(1), xl(2), xl(3).
         !DKB-todo: The following does not spread particles uniformly in the
         !DKB-todo: volume if the edge lengths are different.
+        !JCH-todo: It also doesn't take the intially sheared BCs into account
           xl0=(float(n)/(aspect(1)*aspect(2)*aspect(3)*rho))**(1.d0/3.d0)
           xl = aspect*xl0
           write(6,10300)

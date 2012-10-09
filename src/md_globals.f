@@ -1,9 +1,9 @@
 !*******************************************************************************
-!    MD 6.2.0
+!    MD 6.3.0
 ! ---------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
-!    Author:            Don Berry
-!    Last modified by:  Don Berry, 2012-May-23
+!    Authors:           Don Berry, Joe Hughto
+!    Last modified by:  Joe Hughto, 2012-Oct-09
 ! ---------------------------------------------------------------------
 !
 !*******************************************************************************
@@ -20,6 +20,7 @@
 
       integer, parameter    :: MAXSPEC=1000       !max number of species allowed
       real(dble), parameter :: XNOSTRAIN=1000.d0  !indicates no strain
+      real(dble), parameter :: XNOSHEAR=1000.d0   !indicates no shear
 
       real(dble), parameter :: HBARC=197.327d0           !hbar*c
       real(dble), parameter :: ALPHA=1.d0/137.036d0      !fine structure constant
@@ -55,10 +56,10 @@
       real(dble)    :: ztot=0.0     !total charge of system
       real(dble)    :: rho=0.0      !particle density (particles/fm^3)
       real(dble)    :: xl0=0.0      !fundamental edge length
-      real(dble)    :: aspect(3)=(/1.0,1.0,1.0/)     !simulation box edge aspect ratio
-      real(dble)    :: xl(3)=(/0.0,0.0,0.0/)         !simulation box edge lengths (fm)
-      real(dble)    :: deps(3)=(/XNOSTRAIN,XNOSTRAIN,XNOSTRAIN/) !xx, yy and zz strain rates
-      real(dble)    :: strnfac(3)=(/1.0,1.0,1.0/)    !strain factors in each dimension
+      real(dble)    :: aspect(6)=(/1.0,1.0,1.0,0.0,0.0,0.0/)     !simulation box edge aspect ratio
+      real(dble)    :: xl(6)=(/0.0,0.0,0.0,0.0,0.0,0.0/)         !simulation box edge lengths (fm)
+      real(dble)    :: deps(6)=(/XNOSTRAIN,XNOSTRAIN,XNOSTRAIN,XNOSHEAR,XNOSHEAR,XNOSHEAR/) !xx, yy and zz strain rates and yz, zx, and xy shear rates
+      real(dble)    :: strnfac(6)=(/1.0,1.0,1.0,0.0,0.0,0.0/)    !strain factors in each dimension
       real(dble)    :: kT=0.0       !temperature (MeV)
       real(dble)    :: xmass=931.00 !nucleon mass (MeV)
       real(dble)    :: rmax=0.0     !radius of nucleus, for doing large-nucleus sims.

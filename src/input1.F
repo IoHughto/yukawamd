@@ -1,9 +1,9 @@
 !*******************************************************************************
-!    MD 6.2.0
+!    MD 6.3.0
 ! ----------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
-!    Author:            Don Berry
-!    Last modified by:  Don Berry, 2012-May-23
+!    Authors:           Don Berry, Joe Hughto
+!    Last modified by:  Joe Hughto, 2012-Oct-09
 ! ----------------------------------------------------------------------
 !
 ! Read the parameter file for the simulation. Use input parameters to calculate
@@ -207,10 +207,10 @@
       call strainfactors
       write(6,125) xl0, aspect, xl, deps
       write(7,125) xl0, aspect, xl, deps
-  125 format('  L0           = ', 2x,f17.8, ' fm'      /    &
-             '  edge aspect  = ', 3(6x,f13.8)          /    &
-             '  Lx,Ly,Lz     = ', 3(2x,f17.8), ' fm'   /    &
-             '  strainrates  = ', 3(2x,es17.9), ' (c/fm)')
+  125 format('  L0                       = ', 2x,f17.8, ' fm'      /    &
+             '  edge aspect              = ', 6(6x,f13.8)          /    &
+             '  Lx,Ly,Lz,Lyz,Lzx,Lxy     = ', 6(2x,f17.8), ' fm'   /    &
+             '  strainrates              = ', 6(2x,es17.9), ' (c/fm)')
 
 !  System temperature.
       write(6,130) kT

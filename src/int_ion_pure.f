@@ -1,9 +1,9 @@
 !*******************************************************************************
-!    MD 6.2.0
+!    MD 6.3.0
 ! ---------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
-!    Author:            Don Berry
-!    Last modified by:  Don Berry, 2012-May-17
+!    Authors:           Don Berry, Joe Hughto
+!    Last modified by:  Joe Hughto, 2012-Oct-09
 ! ---------------------------------------------------------------------
 !
 ! This file contains subroutines for calculating potential energy, accelerations,
@@ -59,11 +59,13 @@
          !$omp do reduction(+:ytmp), schedule(runtime)
          do 90 j=i+1,n-1
             r2=0.
+!Shear changes start here
             do k=1,3
                xx=abs(x(k,i)-x(k,j))
                xx=min(xx,xl(k)-xx)
                r2=r2+xx*xx
             enddo
+!end here
             if(r2.le.rccut2) then
                r=sqrt(r2)
                evx = exp(-xmuc*r)/r                 !potential energy of pair ij
@@ -144,12 +146,14 @@
         !$omp do reduction(+:evx,virx,fi,pxx,pxy,pxz,pyy,pyz,pzz)
         do 90 j=i+1,n-1
           r2=0.0d0
+!Shear changes start here
           do k=1,3
             xx(k)=x(k,i)-x(k,j)
             if(xx(k).gt.+halfl(k)) xx(k)=xx(k)-xl(k)
             if(xx(k).lt.-halfl(k)) xx(k)=xx(k)+xl(k)
             r2=r2+xx(k)*xx(k)
           enddo
+!end here
           if(r2.le.rccut2) then
             r=sqrt(r2)
             fc = exp(-xmuc*r)/(r*r2)
@@ -185,12 +189,14 @@
         !$omp do reduction(+:fi)
         do 190 j=i+1,n-1
           r2=0.0d0
+!Shear changes start here
           do k=1,3
             xx(k)=x(k,i)-x(k,j)
             if(xx(k).gt.+halfl(k)) xx(k)=xx(k)-xl(k)
             if(xx(k).lt.-halfl(k)) xx(k)=xx(k)+xl(k)
             r2=r2+xx(k)*xx(k)
           enddo
+!end here
           if(r2.le.rccut2) then
             r=sqrt(r2)
             fc = (1.+xmuc*r)*exp(-xmuc*r)/(r*r2)

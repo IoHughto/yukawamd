@@ -1,9 +1,9 @@
 !*******************************************************************************
-!    MD 6.2.0
+!    MD 6.3.0
 ! ---------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
-!    Authors:           Don Berry
-!    Last modified by:  Don Berry, 2012-Mar-30
+!    Authors:           Don Berry, Joe Hughto
+!    Last modified by:  Joe Hughto, 2012-Oct-09
 ! ---------------------------------------------------------------------
 !
 !  Two-particle correlation function, g(r).

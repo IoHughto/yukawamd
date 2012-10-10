@@ -37,7 +37,7 @@ namelist  /run_parameters/
 
    aspect(3)         3 * 1.0                      1       x
 
-   deps(3)           3 * XNOSTRAIN       1
+   deps(3)           6 * XNO             1
 
    rcutoff             1.0d50            1        2       x
 

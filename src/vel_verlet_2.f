@@ -1,10 +1,10 @@
 !*******************************************************************************
 !
-!    MD 6.2.0
+!    MD 6.3.0
 ! ---------------------------------------------------------------------
 !    Copyright 2011, The Trustees of Indiana University
-!    Authors:           Don Berry
-!    Last modified by:  Don Berry, 2011-Dec-29
+!    Authors:           Don Berry, Joe Hughto
+!    Last modified by:  Joe Hughto, 2012-Oct-09
 ! ---------------------------------------------------------------------
 !
 !*******************************************************************************
@@ -21,11 +21,19 @@
       use  md_comm
       implicit real(dble)(a-h,o-z)
       include  'perf.h'
+      integer  i0,i1,i2,i3,i4,i5
 
       logical      do_measurements
       real(dble)   vp(3)
 
       call starttimer()   !DKB-perf (newton)
+      i0=0; i1=0; i2=0; i3=0; i4=0; i5=0
+      if(deps(1).ne.XNOS) i0=1
+      if(deps(2).ne.XNOS) i1=2
+      if(deps(3).ne.XNOS) i2=4
+      if(deps(4).ne.XNOS) i3=1
+      if(deps(5).ne.XNOS) i4=2
+      if(deps(6).ne.XNOS) i5=4
 
 ! ---------------------------------------------------------
 ! Integrate velocities and accelerations a full time step to get
@@ -34,11 +42,80 @@
       !$omp parallel
       !$omp do schedule(runtime)
       do i=0,n-1
-        do k=1,3
-          x(k,i)=x(k,i)+v(k,i)*dt+afac*a(k,i)
-          if(x(k,i).lt.0.0)   x(k,i)=x(k,i)+xl(k)  !periodic boundary conditions
-          if(x(k,i).gt.xl(k)) x(k,i)=x(k,i)-xl(k) 
-        enddo
+         select case (i3+i4+i5)
+         case(0)
+            do k=1,3
+               x(k,i)=x(k,i)+v(k,i)*dt+afac*a(k,i)
+               if(x(k,i).lt.0.0)   x(k,i)=x(k,i)+xl(k) !periodic boundary conditions
+               if(x(k,i).gt.xl(k)) x(k,i)=x(k,i)-xl(k)
+            enddo
+         case(1)
+            do k=1,3
+               x(k,i)=x(k,i)+v(k,i)*dt+afac*a(k,i)
+            enddo
+            if(x(1,i).lt.0.0)   x(1,i)=x(1,i)+xl(1) 
+            if(x(1,i).gt.xl(1)) x(1,i)=x(1,i)-xl(1)
+            if(x(2,i).lt.strnfac(4)/2.d0*x(3,i)) then
+               x(2,i)=x(2,i)+xl(2)
+               x(3,i)=x(3,i)+xl(2)*strnfac(4)/2.d0
+            end if
+            if(x(2,i).gt.strnfac(4)/2.d0*x(3,i)+xl(2)*(1-0.25*strnfac(4)**2.d0) then
+               x(2,i)=x(2,i)-xl(2)
+               x(3,i)=x(3,i)-xl(2)*strnfac(4)/2.d0
+            end if
+            if(x(3,i).lt.strnfac(4)/2.d0*x(2,i)) then
+               x(3,i)=x(3,i)+xl(3)
+               x(2,i)=x(2,i)+xl(3)*strnfac(4)/2.d0
+            end if
+            if(x(3,i).gt.strnfac(4)/2.d0*x(2,i)+xl(3)*(1-0.25*strnfac(4)**2.d0) then
+               x(3,i)=x(3,i)-xl(3)
+               x(2,i)=x(2,i)-xl(3)*strnfac(4)/2.d0
+            end if
+         case(2)
+            do k=1,3
+               x(k,i)=x(k,i)+v(k,i)*dt+afac*a(k,i)
+            enddo
+            if(x(2,i).lt.0.0)   x(2,i)=x(2,i)+xl(2) 
+            if(x(2,i).gt.xl(2)) x(2,i)=x(2,i)-xl(2)
+            if(x(3,i).lt.strnfac(5)/2.d0*x(1,i)) then
+               x(3,i)=x(3,i)+xl(3)
+               x(1,i)=x(1,i)+xl(3)*strnfac(5)/2.d0
+            end if
+            if(x(3,i).gt.strnfac(5)/2.d0*x(1,i)+xl(3)*(1-0.25*strnfac(5)**2.d0) then
+               x(3,i)=x(3,i)-xl(3)
+               x(1,i)=x(1,i)-xl(3)*strnfac(5)/2.d0
+            end if
+            if(x(1,i).lt.strnfac(5)/2.d0*x(3,i)) then
+               x(1,i)=x(1,i)+xl(1)
+               x(3,i)=x(3,i)+xl(1)*strnfac(5)/2.d0
+            end if
+            if(x(1,i).gt.strnfac(5)/2.d0*x(3,i)+xl(1)*(1-0.25*strnfac(5)**2.d0) then
+               x(1,i)=x(1,i)-xl(1)
+               x(3,i)=x(3,i)-xl(1)*strnfac(5)/2.d0
+            end if
+         case(4)
+            do k=1,3
+               x(k,i)=x(k,i)+v(k,i)*dt+afac*a(k,i)
+            enddo
+            if(x(3,i).lt.0.0)   x(3,i)=x(3,i)+xl(3) 
+            if(x(3,i).gt.xl(3)) x(3,i)=x(3,i)-xl(3)
+            if(x(1,i).lt.strnfac(6)/2.d0*x(2,i)) then
+               x(1,i)=x(1,i)+xl(1)
+               x(2,i)=x(2,i)+xl(1)*strnfac(6)/2.d0
+            end if
+            if(x(1,i).gt.strnfac(6)/2.d0*x(2,i)+xl(1)*(1-0.25*strnfac(6)**2.d0) then
+               x(1,i)=x(1,i)-xl(1)
+               x(2,i)=x(2,i)-xl(1)*strnfac(6)/2.d0
+            end if
+            if(x(2,i).lt.strnfac(6)/2.d0*x(1,i)) then
+               x(2,i)=x(2,i)+xl(2)
+               x(1,i)=x(1,i)+xl(2)*strnfac(6)/2.d0
+            end if
+            if(x(2,i).gt.strnfac(6)/2.d0*x(1,i)+xl(2)*(1-0.25*strnfac(6)**2.d0) then
+               x(2,i)=x(2,i)-xl(2)
+               x(1,i)=x(1,i)-xl(2)*strnfac(6)/2.d0
+            end if
+         end select
       enddo
       !$omp end do
 

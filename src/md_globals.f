@@ -16,12 +16,11 @@
       save
 
       character*10, parameter :: code_name='MD'
-      character*8, parameter  :: code_version='6.2.0'
+      character*8, parameter  :: code_version='6.3.0'
 
       integer, parameter    :: MAXSPEC=1000       !max number of species allowed
-      real(dble), parameter :: XNOSTRAIN=1000.d0  !indicates no strain
-      real(dble), parameter :: XNOSHEAR=1000.d0   !indicates no shear
-
+      real(dble), parameter :: XNOS=1000.d0       !indicates no strain
+    
       real(dble), parameter :: HBARC=197.327d0           !hbar*c
       real(dble), parameter :: ALPHA=1.d0/137.036d0      !fine structure constant
       real(dble), parameter :: ALPHAI=137.036d0
@@ -56,9 +55,9 @@
       real(dble)    :: ztot=0.0     !total charge of system
       real(dble)    :: rho=0.0      !particle density (particles/fm^3)
       real(dble)    :: xl0=0.0      !fundamental edge length
-      real(dble)    :: aspect(6)=(/1.0,1.0,1.0,0.0,0.0,0.0/)     !simulation box edge aspect ratio
-      real(dble)    :: xl(6)=(/0.0,0.0,0.0,0.0,0.0,0.0/)         !simulation box edge lengths (fm)
-      real(dble)    :: deps(6)=(/XNOSTRAIN,XNOSTRAIN,XNOSTRAIN,XNOSHEAR,XNOSHEAR,XNOSHEAR/) !xx, yy and zz strain rates and yz, zx, and xy shear rates
+      real(dble)    :: aspect(3)=(/1.0,1.0,1.0/)     !simulation box edge aspect ratio
+      real(dble)    :: xl(3)=(/0.0,0.0,0.0/)         !simulation box edge lengths (fm)
+      real(dble)    :: deps(6)=(/XNOS,XNOS,XNOS,XNOS,XNOS,XNOS/) !xx, yy and zz strain rates and yz, zx, and xy shear rates
       real(dble)    :: strnfac(6)=(/1.0,1.0,1.0,0.0,0.0,0.0/)    !strain factors in each dimension
       real(dble)    :: kT=0.0       !temperature (MeV)
       real(dble)    :: xmass=931.00 !nucleon mass (MeV)

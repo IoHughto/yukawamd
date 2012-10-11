@@ -3,7 +3,7 @@
 ! ---------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
 !    Author:            Don Berry
-!    Last modified by:  Don Berry, 2012-May-23
+!    Last modified by:  Don Berry, 2012-Jul-12
 ! ---------------------------------------------------------------------
 !
 !*******************************************************************************
@@ -54,11 +54,12 @@
       integer       :: n=0          !total number of particles
       real(dble)    :: ztot=0.0     !total charge of system
       real(dble)    :: rho=0.0      !particle density (particles/fm^3)
-      real(dble)    :: xl0=0.0      !fundamental edge length
-      real(dble)    :: aspect(3)=(/1.0,1.0,1.0/)     !simulation box edge aspect ratio
-      real(dble)    :: xl(3)=(/0.0,0.0,0.0/)         !simulation box edge lengths (fm)
+      real(dble)    :: xlf=0.0      !fundamental edge length
+      real(dble)    :: aspect(3)=(/0.0,0.0,0.0/)    !box edge aspect ratio
+      real(dble)    :: xl0(3)=(/0.0,0.0,0.0/)       !gage dimensions (fm)
+      real(dble)    :: xl(3)=(/0.0,0.0,0.0/)        !dimensions at current step (fm)
+      real(dble)    :: stretch(3)=(/1.0,1.0,1.0/)   !stretch of box relative to gage dims
       real(dble)    :: deps(3)=(/XNOSTRAIN,XNOSTRAIN,XNOSTRAIN/) !xx, yy and zz strain rates
-      real(dble)    :: strnfac(3)=(/1.0,1.0,1.0/)    !strain factors in each dimension
       real(dble)    :: kT=0.0       !temperature (MeV)
       real(dble)    :: xmass=931.00 !nucleon mass (MeV)
       real(dble)    :: rmax=0.0     !radius of nucleus, for doing large-nucleus sims.

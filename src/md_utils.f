@@ -4,7 +4,7 @@
 ! ---------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
 !    Authors:           Don Berry
-!    Last modified by:  Don Berry, 2012-May-02
+!    Last modified by:  Don Berry, 2012-Jul-12
 ! ---------------------------------------------------------------------
 !
 !*******************************************************************************
@@ -28,8 +28,8 @@
 
 !  Only MPI process 0 writes to the checkpoint file.
       if(myrank.eq.0) then
-        write(mdckptfile,110) int(time/1000000.d0), int(mod(time,1000000.d0)), '.ckpt'
-        write(mdoutfile,110) int(time/1000000.d0), int(mod(time,1000000.d0)), '.xv8b'
+        write(mdckptfile,110) nint(time/1000000.d0), nint(mod(time,1000000.d0)), '.ckpt'
+        write(mdoutfile,110) nint(time/1000000.d0), nint(mod(time,1000000.d0)), '.xv8b'
   110   format('md.',i5.5,i6.6,a)
         call write_xvb(mdoutfile,'xv8b  ',.false.,.true.)
       endif
@@ -70,16 +70,44 @@
 
       character*256   mdoutfile
 
-!  Only MPI process 0 writes to the file.
+! Only MPI process 0 writes to the file.
       if(myrank.eq.0) then
         if(xappend) then
-          write(mdoutfile,100) int(tend/1000000.d0), int(mod(tend,1000000.d0)), trim(xfiletype)
+          write(mdoutfile,100) nint(tend/1000000.d0), nint(mod(tend,1000000.d0)), trim(xfiletype)
   100     format('md.traj.',i5.5,i6.6,'.',a)
         else
-          write(mdoutfile,110) int(time/1000000.d0), int(mod(time,1000000.d0)), trim(xfiletype)
+          write(mdoutfile,110) nint(time/1000000.d0), nint(mod(time,1000000.d0)), trim(xfiletype)
   110     format('md.',i5.5,i6.6,'.',a)
         endif
-        call write_xvb(mdoutfile,xfiletype,xappend,.true.)
+        !-----------------------------------------------------------------------
+        select case(trim(xfiletype))
+
+          case('onp','md1','xfa','xvfa')
+          !------------------
+            call write_xvfa(start,xfiletype,.true.,.true.)
+
+          case('md0','x4a','xv4a','x8a','xv8a','xva8a')
+          !----------------------------------------------
+            call write_xva(mdoutfile,xfiletype,xappend,.true.)
+
+          case('xvZAfa')
+          !------------------
+            call write_xvfa(start,xfiletype,xappend,.true.)
+
+          case('x4b','x8b','xv4b','xv8b')
+          !--------------------------------
+            call write_xvb(mdoutfile,xfiletype,xappend,.true.)
+
+          case('xfb','xvfb')
+          !-------------------
+            call write_xvfb(start,xfiletype,xappend,.true.)
+
+          case('xZAfb','xvZAfb')
+          !------------------
+            call write_xvfb(start,xfiletype,xappend,.true.)
+
+        end select
+        !-----------------------------------------------------------------------
       endif
       call MPI_barrier(MPI_COMM_WORLD,ierror)
       return

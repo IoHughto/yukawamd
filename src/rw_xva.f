@@ -135,6 +135,7 @@
             n=n-(4+4)       !record 2: (4_4 byte record markers)
             n=n/(6*8)       !record 2: 3 real*8 coordinates and velocities
           endif
+          write(6,*) 'xv8a: ',n
           if(.not.allocated(x)) allocate(x(3,0:n-1))
           if(.not.allocated(v)) allocate(v(3,0:n-1))
           read(13) time

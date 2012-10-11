@@ -3,7 +3,7 @@
 ! ---------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
 !    Authors:           Don Berry
-!    Last modified by:  Don Berry, 2012-May-17
+!    Last modified by:  Don Berry, 2012-Jul-12
 ! ---------------------------------------------------------------------
 !
 ! This file contains I/O routines for revision b unformatted MD configuration
@@ -72,8 +72,7 @@
       read(13) xcode_name, xcode_version
       read(13) date,daytime,timezone
       read(13) xsim_type
-      read(13) time,xl(1),xl(2),xl(3), ev,ek, px, pp, n
-      rho=n/(xl(1)*xl(2)*xl(3))
+      read(13) time,xl(1),xl(2),xl(3), ev,ek, px, pp, n  !for current configuration
 
 !DKB-debug:
 !      write(6,10010) xfiletype
@@ -84,14 +83,16 @@
 !10014 format('rw_xvb: date   =',a,2x,a,2x,a)
 !      write(6,10016) xsim_type
 !10016 format('rw_xvb: sim_type    =',a)
-!      write(6,10018) time, xl, ev,ek,px, pp, n
-!10018 format('rw_xvb: time   =',f12.3  / &
-!             'rw_xvb: xl   =',3es17.8/ &
-!             'rw_xvb: ev,ek,px=',3es17.8/ &
-!             'rw_xvb: pp   =',3es17.8/ &
-!             'rw_xvb:       ',3es17.8/ &
-!             'rw_xvb:       ',3es17.8/ &
-!             'rw_xvb: n    =',i10)
+!      write(6,10018) xlf, aspect, time, xl, ev,ek,px, pp, n
+!10018 format('rw_xvb: xlf     =',es17.8  / &
+!             'rw_xvb: aspect  =',3es17.8 / &
+!             'rw_xvb: time    =',f12.3   / &
+!             'rw_xvb: xl      =',3es17.8 / &
+!             'rw_xvb: ev,ek,px=',3es17.8 / &
+!             'rw_xvb: pp      =',3es17.8 / &
+!             'rw_xvb:          ',3es17.8 / &
+!             'rw_xvb:          ',3es17.8 / &
+!             'rw_xvb: n       =',i10)
 
       select case (trim(xftype))
 

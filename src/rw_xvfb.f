@@ -3,7 +3,7 @@
 ! ---------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
 !    Authors:           Don Berry
-!    Last modified by:  Don Berry, 2012-May-16
+!    Last modified by:  Don Berry, 2012-Jul-09
 ! ---------------------------------------------------------------------
 !
 !*******************************************************************************
@@ -152,6 +152,7 @@
       read(13,*) xcode_name, xcode_version
       read(13,*) date,daytime,timezone
       read(13,*) xsim_type
+      read(13,*) xl0(1),xl0(2),xl0(3)
       read(13,*) time,xl(1),xl(2),xl(3), ev,ek, px, pp, n
       rho=n/(xl(1)*xl(2)*xl(3))
 
@@ -234,16 +235,18 @@
         endif
       endif
       call date_and_time(date,daytime,timezone)
-     !DKB-todo: Need to use explicit formatting here.
-      write(14,10010) trim(xftype)
-      write(14,10010) trim(code_name), trim(code_version)
-      write(14,10010) trim(date),trim(daytime),trim(timezone)
-      write(14,10010) trim(sim_type)
-      write(14,10050) time
-      write(14,10050) xl(1),xl(2),xl(3)
-      write(14,10054) ev,ek,px
-      write(14,10058) pp
-      write(14,10060) n
+      if(trim(xftype).ne.'XYZ') then
+        write(14,10010) trim(xftype)
+        write(14,10010) trim(code_name), trim(code_version)
+        write(14,10010) trim(date),trim(daytime),trim(timezone)
+        write(14,10010) trim(sim_type)
+        write(14,10050) xl0(1),xl0(2),xl0(3)
+        write(14,10050) time
+        write(14,10050) xl(1),xl(2),xl(3)
+        write(14,10054) ev,ek,px
+        write(14,10058) pp
+        write(14,10060) n
+      endif
 10010 format('# ',a,2x,a,2x,a)
 10050 format('#',/,'# ',3(1x,f12.6))
 10054 format('#',/,'# ',3(1x,es15.8))
@@ -271,8 +274,10 @@
         case('XYZ')
           write(14,10160) n
 10160     format(i10)
-          write(14,"('[XYZ file]')")
+          write(14,10062) xl(1),xl(2),xl(3)
+         !write(14,"('[XYZ file]')")
           write(14,10164) (ctype(i),x(1,i),x(2,i),x(3,i), i=0,n-1)
+10062     format('# ',3(1x,f12.6))
 10164     format(1x,a6,1x,f12.6,1x,f12.6,1x,f12.6)
 
       end select

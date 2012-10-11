@@ -4,7 +4,7 @@
 ! ---------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
 !    Authors:           Don Berry
-!    Last modified by:  Don Berry, 2012-May-04
+!    Last modified by:  Don Berry, 2012-Jul-12
 ! ---------------------------------------------------------------------
 !
 !*******************************************************************************
@@ -46,7 +46,7 @@
 ! Copy temporary log file to permanent one, and delete temporary.
       tend = tstart + dt*(nwgroup*nwsteps + ngroup*ntot*nind)
       if(myrank.eq.0) then
-        write(suffix,22) int(tend/1000000.d0), int(mod(tend,1000000.d0))
+        write(suffix,22) nint(tend/1000000.d0), nint(mod(tend,1000000.d0))
    22   format(i5.5,i6.6)
         open(8,FILE='md.'//trim(suffix)//'.log', FORM='FORMATTED',STATUS='UNKNOWN')
         rewind(7)
@@ -71,8 +71,8 @@
       call ttot(ek)
       e=ev+ek
       if(myrank.eq.0) then
-        write(6,10050) '  Initial config:  Vtot, Ttot, E, P = ',ev,ek,e,px
-        write(8,10050) '  Initial config:  Vtot, Ttot, E, P = ',ev,ek,e,px
+        write(6,10050) '  Initial Vtot, Ttot, E, P = ',ev,ek,e,px
+        write(8,10050) '  Initial Vtot, Ttot, E, P = ',ev,ek,e,px
 10050   format(/,a,4(2x,es16.9))
       endif
 
@@ -112,7 +112,7 @@
           '  Measurement phase',/,  &
           'e   step     time            Vtot              Ttot               E              pressure',/, &
           'p   step     time            P_xx              P_xy              P_xz              P_yy              P_yz              P_zz')
-        write(suffix,22) int(tend/1000000.d0), int(mod(tend,1000000.d0))
+        write(suffix,22) nint(tend/1000000.d0), nint(mod(tend,1000000.d0))
         open(9,FILE='md.'//trim(suffix)//'.meas',FORM='UNFORMATTED',STATUS='UNKNOWN')
       endif
       evave=0.;  ev2ave=0.
@@ -189,8 +189,17 @@
       call ttot(ek)
       e=ev+ek
       if(myrank.eq.0) then
-        write(6,10210) '  Final config:    Vtot, Ttot, E, P = ',ev,ek,e,px
-        write(8,10210) '  Final config:    Vtot, Ttot, E, P = ',ev,ek,e,px
+        stretch=xl/xl0
+        aspect=stretch*aspect
+        rho=float(n)/(xl(1)*xl(2)*xl(3))
+        write(6,10206) xl, aspect, stretch, rho
+        write(8,10206) xl, aspect, stretch, rho
+10206   format('  Final dimensions  =',3(2x,f17.9), ' fm', /   &
+               '  Final aspect      =',3(2x,f17.9),        /   & 
+               '  Final stretch     =',3(2x,f17.9),        /   &
+               '  Final density     =',1x,es15.8, ' fm-3' )
+        write(6,10210) '  Final Vtot, Ttot, E, P   = ',ev,ek,e,px
+        write(8,10210) '  Final Vtot, Ttot, E, P   = ',ev,ek,e,px
 10210   format(a,4(2x,es16.9))
       endif
 

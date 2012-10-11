@@ -3,7 +3,7 @@
 ! ---------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
 !    Author:            Don Berry
-!    Last modified by:  Don Berry, 2012-May-23
+!    Last modified by:  Don Berry, 2012-Jul-07
 ! ---------------------------------------------------------------------
 !
 !*******************************************************************************
@@ -50,10 +50,11 @@ CONTAINS
          xparm(11)    = ai
          xparm(20)    = rho
          xparm(21)    = rmax
-         xparm(22:24) = xl
-         xparm(25:27) = strnfac
-         xparm(30)    = kT
-         xparm(31)    = xmass
+         xparm(22:24) = xl0
+         xparm(25:27) = xl
+         xparm(28:30) = deps
+         xparm(31)    = kT
+         xparm(32)    = xmass
          xparm(40)    = qmin
          xparm(41)    = dq
          xparm(50)    = xmuc
@@ -79,10 +80,11 @@ CONTAINS
          ai         = xparm(11)
          rho        = xparm(20)
          rmax       = xparm(21)
-         xl         = xparm(22:24)
-         strnfac    = xparm(25:27)
-         kT         = xparm(30)
-         xmass      = xparm(31)
+         xl0        = xparm(22:24)
+         xl         = xparm(25:27)
+         deps       = xparm(28:30)
+         kT         = xparm(31)
+         xmass      = xparm(32)
          qmin       = xparm(40)
          dq         = xparm(41)
          xmuc       = xparm(50)

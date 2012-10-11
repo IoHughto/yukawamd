@@ -3,7 +3,7 @@
 ! ----------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
 !    Author:            Don Berry
-!    Last modified by:  Don Berry, 2012-May-23
+!    Last modified by:  Don Berry, 2012-Jul-13
 ! ----------------------------------------------------------------------
 !
 ! Read the parameter file for the simulation. Use input parameters to calculate
@@ -41,9 +41,9 @@
                  nout, ftype, append,                    &
                  spec_file, spec_list,                   &
                  rho, aspect,                            &
-                 kT,                                     &
-                 deps,                                   &
+                 deps, stretch,                          &
                  rccut,                                  &
+                 kT,                                     &
                  xmass,                                  &
                  coulomb, xlambda, frp,                  &
                  bfield,                                 &
@@ -201,26 +201,35 @@
 
 !-------------------------------------------------------------------------------
 !  Particle density, box edge aspect ratio, edge lengths, strain rates.
-      write(6,124) rho
-      write(7,124) rho
-  124 format(/,'  rho          = ', es15.8, ' fm-3')
-      call strainfactors
-      write(6,125) xl0, aspect, xl, deps
-      write(7,125) xl0, aspect, xl, deps
-  125 format('  L0           = ', 2x,f17.8, ' fm'      /    &
-             '  edge aspect  = ', 3(6x,f13.8)          /    &
-             '  Lx,Ly,Lz     = ', 3(2x,f17.8), ' fm'   /    &
-             '  strainrates  = ', 3(2x,es17.9), ' (c/fm)')
+      write(6,124,advance='no') rho, xlf, xl0, aspect
+      write(7,124,advance='no') rho, xlf, xl0, aspect
+  124 format(/,'  rho               =', es16.8, ' fm-3',   /    &
+             '  L0                =', 2x,f17.9, ' fm'      /    &
+             '  gage dimensions   =', 3(2x,f17.9), ' fm',  /    &
+             '  gage aspect       =', 3(6x,f13.9)          /    &
+             '  strainrates       =')
+      do k=1,3
+        if(deps(k).eq.XNOSTRAIN) then
+          write(6,"(19x)",advance='no')
+          write(7,"(19x)",advance='no')
+        else
+          write(6,"(2x,es17.9)",advance='no') deps(k)
+          write(7,"(2x,es17.9)",advance='no') deps(k)
+        endif
+      enddo
+      write(6,"(' c/fm')")
+      write(7,"(' c/fm')")
+      xl = stretch*xl0
+      write(6,126) xl, stretch
+      write(7,126) xl, stretch
+  126 format('  config dimensions =', 3(2x,f17.9), ' fm', /  &
+             '  config stretch    =', 3(2x,f17.9))
 
-!  System temperature.
-      write(6,130) kT
-      write(7,130) kT
-  130 format('  kT           = ', f10.6,   ' MeV')
-
-!  Nucleon mass.
-      write(6,110) xmass
-      write(7,110) xmass
-  110 format('  nucleon mass = ', f8.3, ' MeV')
+!  System temperature. Nucleon mass.
+      write(6,130) kT, xmass
+      write(7,130) kT, xmass
+  130 format(/,'  kT                = ', f10.6,   ' MeV',/    &
+             '  nucleon mass      = ', f8.3, ' MeV')
 
 !-------------------------------------------------------------------------------
 ! Two-particle correlation function, and static structure function.

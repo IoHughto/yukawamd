@@ -13,9 +13,8 @@
 #MDEF       = PGI
  MDEF       = BigRed
 #MDEF       = Quarry
-#MDEF       = Ubuntu #Never really got this one to work
 
- include ../mdef/$(MDEF).def
+include ../mdef/$(MDEF).def
 
  FCFLAGS    = $(F95OPT) $(TARCH) $(F95FLAGS) $(ATP)
  FCVERSION  = $(F95VERSION)

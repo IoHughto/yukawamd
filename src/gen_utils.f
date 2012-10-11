@@ -112,18 +112,36 @@
 
 
 !*******************************************************************************
-! Calculate distance between particles i and j. Return result in rr.
+! Calculate distance between particles i and j using sheared BCs if relevant. 
+! Return result in rr.
 !
       subroutine pdist(i,j,rr)
       use  md_globals
       implicit real(dble) (a-h,o-z)
+      integer i3, i4, i5
+
+      i3=0; i4=0; i5=0
+      if(deps(4).ne.XNOS) i3=1
+      if(deps(5).ne.XNOS) i4=2
+      if(deps(6).ne.XNOS) i5=4
 
       rr=0.
-      do k=1,3
-         yy=abs(x(k,i)-x(k,j))
-         yy=min(yy,xl(k)-yy)   
+      select case (i3+i4+i5)
+      case(0)
+         do k=1,3
+            yy=abs(x(k,i)-x(k,j))
+            yy=min(yy,xl(k)-yy)   
+            rr=rr+yy*yy
+         enddo
+      case(1)
+         yy=abs(x(1,i)-x(1,j))
+         yy=min(yy,xl(1)-yy)
          rr=rr+yy*yy
-      enddo
-      rr=sqrt(rr)+1.e-15
+         yy=abs(x(2,i)-x(2,j))
+         zz=abs(x(3,i)-x(3,j))
+         rrr=yy*yy+zz*zz
+         rrr=min(rrr,(yy+xl(2))**2.d0+(zz+strnfac(4)/2.d0*xl(3))**2.d0
+      end select
+         rr=sqrt(rr)
       return
       end subroutine pdist

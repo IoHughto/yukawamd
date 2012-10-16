@@ -1,9 +1,9 @@
 !*******************************************************************************
-!    MD 6.2.0
+!    MD 6.3.0
 ! ---------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
-!    Author:            Don Berry
-!    Last modified by:  Don Berry, 2012-Jul-12
+!    Authors:           Don Berry, Joe Hughto
+!    Last modified by:  Joe Hughto, 2012-Oct-15
 ! ---------------------------------------------------------------------
 !
 !*******************************************************************************
@@ -16,7 +16,7 @@
       save
 
       character*10, parameter :: code_name='MD'
-      character*8, parameter  :: code_version='6.2.0'
+      character*8, parameter  :: code_version='6.3.0'
 
       integer, parameter    :: MAXSPEC=1000       !max number of species allowed
       real(dble), parameter :: XNOSTRAIN=1000.d0  !indicates no strain
@@ -59,7 +59,7 @@
       real(dble)    :: xl0(3)=(/0.0,0.0,0.0/)       !gage dimensions (fm)
       real(dble)    :: xl(3)=(/0.0,0.0,0.0/)        !dimensions at current step (fm)
       real(dble)    :: stretch(3)=(/1.0,1.0,1.0/)   !stretch of box relative to gage dims
-      real(dble)    :: deps(3)=(/XNOSTRAIN,XNOSTRAIN,XNOSTRAIN/) !xx, yy and zz strain rates
+      real(dble)    :: deps(6)=(/XNOSTRAIN,XNOSTRAIN,XNOSTRAIN,XNOSTRAIN,XNOSTRAIN,XNOSTRAIN/) !xx, yy and zz strain rates
       real(dble)    :: kT=0.0       !temperature (MeV)
       real(dble)    :: xmass=931.00 !nucleon mass (MeV)
       real(dble)    :: rmax=0.0     !radius of nucleus, for doing large-nucleus sims.

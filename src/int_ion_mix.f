@@ -1,9 +1,9 @@
 !*******************************************************************************
-!    MD 6.2.0
+!    MD 6.3.0
 ! ---------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
-!    Author:            Don Berry
-!    Last modified by:  Don Berry, 2012-May-17
+!    Authors:           Don Berry, Joe Hughto
+!    Last modified by:  Joe Hughto, 2012-Oct-16
 ! ---------------------------------------------------------------------
 !
 ! This file contains subroutines for calculating potential energy, accelera-
@@ -41,14 +41,12 @@
       real(dble)   xtmp(2)   !for accumulating potential energy and virial
       real(dble)   ytmp(2)   !(ditto)
       real(dble)   xx        !temporary variable, for distance calculation
-      real(dble)   r2,r      !distance squared and distance between two ions
-      real(dble)   rccut2    !cutoff radius squared
+      real(dble)   r         !distance squared and distance between two ions
       real(dble)   evcut     !potential at cutoff radius
 
       call starttimer()   !DKB-perf (vtot)
       call starttimer()   !DKB-perf (calc_v)
 
-      rccut2=rccut**2
       if( rccut .le. sqrt(xl(1)**2+xl(2)**2+xl(3)**2)/2.0 ) then
          evcut=exp(-xmuc*rccut)/rccut
       else
@@ -57,18 +55,13 @@
 
       ytmp=0.0d0
       xtmp=0.0d0
-      !$omp parallel private(xx,r2,r,evx)
+      !$omp parallel private(xx,r,evx)
       do 100 i=myrank,n-2,nprocs
          !$omp do reduction(+:xtmp), schedule(runtime)
          do 90 j=i+1,n-1
-            r2=0.
-            do k=1,3
-               xx=abs(x(k,i)-x(k,j))
-               xx=min(xx,xl(k)-xx)
-               r2=r2+xx*xx
-            enddo
-            if(r2.le.rccut2) then
-               r=sqrt(r2)
+            r=0.d0
+            call pdist(i,j,r)
+            if(r.le.rccut) then
                evx = exp(-xmuc*r)/r                        !potential energy of pair ij
                xtmp(1) = xtmp(1) + zii(j)*(evx-evcut)      !accumulate into total for i
                xtmp(2) = xtmp(2) + zii(j)*(1.+xmuc*r)*evx  !contribution to virial
@@ -114,9 +107,7 @@
                                    !   pressure tensor
 
       real(dble)   xx(3)       !position vector of ion i relative to j
-      real(dble)   halfl(3)    !simulation box half edge lengths
-      real(dble)   r2,r        !distance-squared and distance between two ions
-      real(dble)   rccut2      !square of screened coulomb cutoff radius
+      real(dble)   r           !distance-squared and distance between two ions
       real(dble)   evcut       !potential at cutoff radius
       real(dble)   evx         !for accumulating potential energy
       real(dble)   vir,virx    !for accumulating virial
@@ -135,9 +126,7 @@
       allocate(fj(3,0:n+2))   !locations n, n+1, n+2 are used in MPI_allreduce.
       fj  = 0.0d0
       pp(:,:) = 0.0d0
-      halfl=0.5*xl
 
-      rccut2=rccut**2
       if( rccut .le. sqrt(xl(1)**2+xl(2)**2+xl(3)**2)/2.0 ) then
         evcut=exp(-xmuc*rccut)/rccut
       else
@@ -154,107 +143,95 @@
 ! potential energy, virial and pressure tensor in addition to all the forces.
       if(do_measurements) then
 
-      !$omp parallel private(xx,r2,r,fc,fx,fy,fz)
-      do 100 i=myrank,n-2,nprocs
-        !$omp do reduction(+:evx,virx,fi,pxx,pxy,pxz,pyy,pyz,pzz), schedule(runtime)
-        do 90 j=i+1,n-1
-          r2=0.0d0
-          do k=1,3
-            xx(k)=x(k,i)-x(k,j)
-            if(xx(k).gt.+halfl(k)) xx(k)=xx(k)-xl(k)
-            if(xx(k).lt.-halfl(k)) xx(k)=xx(k)+xl(k)
-            r2=r2+xx(k)*xx(k)
-          enddo
-          if(r2.le.rccut2) then
-            r=sqrt(r2)
-            fc = exp(-xmuc*r)/(r*r2)       !common factor for potential and force
-            evx = evx + zii(j)*(fc*r2-evcut)  !add potential of pair ij to total for i
-            fc = (1.+xmuc*r)*fc            !central force factor
-            virx = virx + zii(j)*fc*r2     !contribution to virial
+         !$omp parallel private(xx,r,fc,fx,fy,fz)
+         do 100 i=myrank,n-2,nprocs
+            !$omp do reduction(+:evx,virx,fi,pxx,pxy,pxz,pyy,pyz,pzz), schedule(runtime)
+            do 90 j=i+1,n-1
+               r=0.d0
+               call pvec(i,j,r,xx)
+               if(r.le.rccut) then
+                  fc = exp(-xmuc*r)/(r*r*r) !common factor for potential and force
+                  evx = evx + zii(j)*(fc*r*r-evcut) !add potential of pair ij to total for i
+                  fc = (1.+xmuc*r)*fc !central force factor
+                  virx = virx + zii(j)*fc*r*r !contribution to virial
 
-           !fi(:) accumulates action of j on i.
-           !fj(:,j) accumulates reaction of i on j
-           !pxx,pxy, ... pzz accumulate sum for pressure tensor
-            fx      = fc*xx(1)
-            fi(1)   = fi(1)   + zii(j)*fx
-            fj(1,j) = fj(1,j) - zii(i)*fx
-            pxx = pxx + xx(1)*(zii(j)*fx)
+                  !fi(:) accumulates action of j on i.
+                  !fj(:,j) accumulates reaction of i on j
+                  !pxx,pxy, ... pzz accumulate sum for pressure tensor
+                  fx      = fc*xx(1)
+                  fi(1)   = fi(1)   + zii(j)*fx
+                  fj(1,j) = fj(1,j) - zii(i)*fx
+                  pxx = pxx + xx(1)*(zii(j)*fx)
 
-            fy      = fc*xx(2)
-            fi(2)   = fi(2)   + zii(j)*fy
-            fj(2,j) = fj(2,j) - zii(i)*fy
-            pxy = pxy + xx(1)*(zii(j)*fy)
-            pyy = pyy + xx(2)*(zii(j)*fy)
+                  fy      = fc*xx(2)
+                  fi(2)   = fi(2)   + zii(j)*fy
+                  fj(2,j) = fj(2,j) - zii(i)*fy
+                  pxy = pxy + xx(1)*(zii(j)*fy)
+                  pyy = pyy + xx(2)*(zii(j)*fy)
 
-            fz      = fc*xx(3)
-            fi(3)   = fi(3)   + zii(j)*fz
-            fj(3,j) = fj(3,j) - zii(i)*fz
-            pxz = pxz + xx(1)*(zii(j)*fz)
-            pyz = pyz + xx(2)*(zii(j)*fz)
-            pzz = pzz + xx(3)*(zii(j)*fz)
-          endif
-   90   continue
-        !$omp end do
-        !$omp single
-        ev  = ev + zii(i)*evx
-        vir = vir + zii(i)*virx
-        fj(:,i) = zii(i)*(fj(:,i)+fi(:))
-        pp(1,1) = pp(1,1)+zii(i)*pxx
-        pp(1,2) = pp(1,2)+zii(i)*pxy
-        pp(1,3) = pp(1,3)+zii(i)*pxz
-        pp(2,2) = pp(2,2)+zii(i)*pyy
-        pp(2,3) = pp(2,3)+zii(i)*pyz
-        pp(3,3) = pp(3,3)+zii(i)*pzz
-        evx=0.0d0
-        virx=0.0d0
-        fi(:)=0.0d0
-        pxx=0.0d0; pxy=0.0d0; pxz=0.0d0; pyy=0.0d0; pyz=0.0d0; pzz=0.0d0
-        !$omp end single
-  100 continue
-      !$omp end parallel
+                  fz      = fc*xx(3)
+                  fi(3)   = fi(3)   + zii(j)*fz
+                  fj(3,j) = fj(3,j) - zii(i)*fz
+                  pxz = pxz + xx(1)*(zii(j)*fz)
+                  pyz = pyz + xx(2)*(zii(j)*fz)
+                  pzz = pzz + xx(3)*(zii(j)*fz)
+               endif
+ 90         continue
+            !$omp end do
+            !$omp single
+            ev  = ev + zii(i)*evx
+            vir = vir + zii(i)*virx
+            fj(:,i) = zii(i)*(fj(:,i)+fi(:))
+            pp(1,1) = pp(1,1)+zii(i)*pxx
+            pp(1,2) = pp(1,2)+zii(i)*pxy
+            pp(1,3) = pp(1,3)+zii(i)*pxz
+            pp(2,2) = pp(2,2)+zii(i)*pyy
+            pp(2,3) = pp(2,3)+zii(i)*pyz
+            pp(3,3) = pp(3,3)+zii(i)*pzz
+            evx=0.0d0
+            virx=0.0d0
+            fi(:)=0.0d0
+            pxx=0.0d0; pxy=0.0d0; pxz=0.0d0; pyy=0.0d0; pyz=0.0d0; pzz=0.0d0
+            !$omp end single
+ 100     continue
+         !$omp end parallel
 
 !-------------------------------------------------------------------------------
 ! If measurements were not called for, use this section, which is a quicker
 ! calculation of just forces.
       else
 
-      !$omp parallel private(xx,r2,r,fc,fx,fy,fz)
-      do 200 i=myrank,n-2,nprocs
-        !$omp do reduction(+:fi), schedule(runtime)
-        do 190 j=i+1,n-1
-          r2=0.0d0
-          do k=1,3
-            xx(k)=x(k,i)-x(k,j)
-            if(xx(k).gt.+halfl(k)) xx(k)=xx(k)-xl(k)
-            if(xx(k).lt.-halfl(k)) xx(k)=xx(k)+xl(k)
-            r2=r2+xx(k)*xx(k)
-          enddo
-          if(r2.le.rccut2) then
-            r=sqrt(r2)
-            fc = (1.+xmuc*r)*exp(-xmuc*r)/(r*r2)
-           !fi(:) accumulates action of j on i.
-           !fj(:,j) accumulates reaction of i on j
-            fx      = fc*xx(1)
-            fi(1)   = fi(1)   + zii(j)*fx
-            fj(1,j) = fj(1,j) - zii(i)*fx
-            fy      = fc*xx(2)
-            fi(2)   = fi(2)   + zii(j)*fy
-            fj(2,j) = fj(2,j) - zii(i)*fy
-            fz      = fc*xx(3)
-            fi(3)   = fi(3)   + zii(j)*fz
-            fj(3,j) = fj(3,j) - zii(i)*fz
-          endif
-  190   continue
-        !$omp end do
-        !$omp single
-        fj(:,i) = zii(i)*(fj(:,i)+fi(:))
-        fi(:)=0.0d0
-        !$omp end single
-  200 continue
-      !$omp end parallel
+         !$omp parallel private(xx,r,fc,fx,fy,fz)
+         do 200 i=myrank,n-2,nprocs
+            !$omp do reduction(+:fi), schedule(runtime)
+            do 190 j=i+1,n-1
+               r=0.d0
+               call pvec(i,j,r,xx)
+               if(r.le.rccut) then
+                  fc = (1.+xmuc*r)*exp(-xmuc*r)/(r*r*r)
+                  !fi(:) accumulates action of j on i.
+                  !fj(:,j) accumulates reaction of i on j
+                  fx      = fc*xx(1)
+                  fi(1)   = fi(1)   + zii(j)*fx
+                  fj(1,j) = fj(1,j) - zii(i)*fx
+                  fy      = fc*xx(2)
+                  fi(2)   = fi(2)   + zii(j)*fy
+                  fj(2,j) = fj(2,j) - zii(i)*fy
+                  fz      = fc*xx(3)
+                  fi(3)   = fi(3)   + zii(j)*fz
+                  fj(3,j) = fj(3,j) - zii(i)*fz
+               endif
+ 190        continue
+            !$omp end do
+            !$omp single
+            fj(:,i) = zii(i)*(fj(:,i)+fi(:))
+            fi(:)=0.0d0
+            !$omp end single
+ 200     continue
+         !$omp end parallel
 !-------------------------------------------------------------------------------
       endif
-      call stoptimer(1,t_calc_a,ts_calc_a,n_calc_a)  !DKB-perf (calc_a)
+      call stoptimer(1,t_calc_a,ts_calc_a,n_calc_a) !DKB-perf (calc_a)
 
 
 ! Pack ev, vir and pp into locations n, n+1 and n+2 of fj, so we need to do only

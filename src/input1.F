@@ -208,7 +208,7 @@
              '  gage dimensions   =', 3(2x,f17.9), ' fm',  /    &
              '  gage aspect       =', 3(6x,f13.9)          /    &
              '  strainrates       =')
-      do k=1,3
+      do k=1,6
         if(deps(k).eq.XNOSTRAIN) then
           write(6,"(19x)",advance='no')
           write(7,"(19x)",advance='no')

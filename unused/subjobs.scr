@@ -1,0 +1,30 @@
+#!/bin/bash
+
+for a in 01 02 03 04 047
+  do
+  for b in 1 2 3
+    do
+    echo '#! /bin/bash -l' > scripts/job.shear.${1}.${a}.${b}.script
+    echo '# @ job_type = MPICH' >> scripts/job.shear.${1}.${a}.${b}.script
+    echo '# @ class = NORMAL' >> scripts/job.shear.${1}.${a}.${b}.script
+    echo '# @ account_no = NONE' >> scripts/job.shear.${1}.${a}.${b}.script
+    echo '# @ node = 12' >> scripts/job.shear.${1}.${a}.${b}.script
+    echo '# @ tasks_per_node = 4' >> scripts/job.shear.${1}.${a}.${b}.script
+    echo '# @ wall_clock_limit = 6:00:00' >> scripts/job.shear.${1}.${a}.${b}.script
+    echo '# @ notification = always' >> scripts/job.shear.${1}.${a}.${b}.script
+    echo '# @ notify_user = jhughto@indiana.edu' >> scripts/job.shear.${1}.${a}.${b}.script
+    echo '# @ environment=COPY_ALL;' >> scripts/job.shear.${1}.${a}.${b}.script
+    echo "# @ output = shear.${1}.${2}.${a}.${b}.out" >> scripts/job.shear.${1}.${a}.${b}.script
+    echo "# @ error = shear.${1}.${2}.${a}.${b}.err" >> scripts/job.shear.${1}.${a}.${b}.script
+    echo '# @ queue' >> scripts/job.shear.${1}.${a}.${b}.script
+    echo "cd /N/u/jhughto/BigRed/" >> scripts/job.shear.${1}.${a}.${b}.script
+    echo -n 'mpirun -np $LOADL_TOTAL_TASKS -machinefile $LOADL_HOSTFILE ' >> scripts/job.shear.${1}.${a}.${b}.script
+    if [[ "$b" == "1" || "$b" == "2" ]]
+	then
+	echo "bin/shearmod.mpi md.${1}.${2}.${a}.${b}.mpi.bin 333 0.01" >> scripts/job.shear.${1}.${a}.${b}.script
+    else
+	echo "bin/shearmod.mpi md.${1}.${2}.${a}.${b}.mpi.bin 334 0.01" >> scripts/job.shear.${1}.${a}.${b}.script
+    fi
+    llsubmit scripts/job.shear.${1}.${a}.${b}.script
+    done
+done

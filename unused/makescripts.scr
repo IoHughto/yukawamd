@@ -1,0 +1,24 @@
+#!/bin/bash
+
+LIMIT=8
+for ((a=0; a < LIMIT ; a++))
+  do
+  echo ' #@ notification = complete' > job.shear.${a}.script
+  echo ' #@ wall_clock_limit = 12:00:00' >> job.shear.${a}.script
+  echo ' #@ environment = COPY_ALL' >> job.shear.${a}.script
+  echo ' #@ class = SERIAL' >> job.shear.${a}.script
+  echo ' #@ initialdir = /N/u/jhughto/BigRed' >> job.shear.${a}.script
+  echo ' #@ account_no = NONE' >> job.shear.${a}.script
+  echo ' #@ node_usage = not_shared' >> job.shear.${a}.script
+  echo ' #@ checkpoint = no' >> job.shear.${a}.script
+  echo " #@ output = shear.${1}.${2}.${3}.${a}.out" >> job.shear.${a}.script
+  echo " #@ error = shear.${1}.${2}.${3}.${a}.err" >> job.shear.${a}.script
+  echo ' #@ queue' >> job.shear.${a}.script
+  for ((b=0;b < 250;b++))
+    do
+    let name=250*a+b
+    echo "./makexyz.mpi md.${1}.${2}/md.${1}.${2}.${3}.mpi.bin md.${1}.${2}/yukawa.${a}.xyz ${1} ${name}" >> job.shear.${a}.script
+    echo "./shearmod md.${1}.${2}/yukawa.${a}.xyz < inp.${1}.shearmod" >> job.shear.${a}.script
+  done
+#  llsubmit job.shear.${a}.script
+done

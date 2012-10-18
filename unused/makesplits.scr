@@ -1,0 +1,28 @@
+#!/bin/bash
+
+LIMIT=${5}
+TOTAL=${4}
+for ((a=0; a < LIMIT ; a++))
+  do
+  let size=${TOTAL}/${LIMIT}
+  let start=1+${a}*${size}
+  let end=(${a}+1)*${size}
+  echo '#! /bin/bash -l' > job.shear.${1}.${a}.script
+  echo '# @ job_type = MPICH' >> job.shear.${1}.${a}.script
+  echo '# @ class = NORMAL' >> job.shear.${1}.${a}.script
+  echo '# @ account_no = NONE' >> job.shear.${1}.${a}.script
+  echo '# @ node = 6' >> job.shear.${1}.${a}.script
+  echo '# @ tasks_per_node = 4' >> job.shear.${1}.${a}.script
+  echo '# @ wall_clock_limit = 25:00:00' >> job.shear.${1}.${a}.script
+  echo '# @ notification = always' >> job.shear.${1}.${a}.script
+  echo '# @ notify_user = jhughto@indiana.edu' >> job.shear.${1}.${a}.script
+  echo '# @ environment=COPY_ALL;' >> job.shear.${1}.${a}.script
+  echo "# @ output = shear.${1}.${2}.${3}.${a}.out" >> job.shear.${1}.${a}.script
+  echo "# @ error = shear.${1}.${2}.${3}.${a}.err" >> job.shear.${1}.${a}.script
+  echo '# @ queue' >> job.shear.${1}.${a}.script
+  echo "cd /N/u/jhughto/BigRed/md.${1}.${2}/" >> job.shear.${1}.${a}.script
+  ./split md.${1}.${2}/md.${1}.${2}.${3}.mpi.bin md.${1}.${2}/md.${a}.bin ${1} ${start} ${end}
+  echo -n 'mpirun -np $LOADL_TOTAL_TASKS -machinefile $LOADL_HOSTFILE ' >> job.shear.${1}.${a}.script
+  echo "./shearmod.mpi md.${a}.bin ${size} 0.01" >> job.shear.${1}.${a}.script
+  llsubmit job.shear.${1}.${a}.script
+done

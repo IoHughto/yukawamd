@@ -1,0 +1,11 @@
+#!/bin/bash
+
+LIMIT=1000
+
+for ((a=0; a < LIMIT ; a++))
+do
+	bin/makexyz.mpi md.${1}.${2}.${3}.bin yukawa.${a}.xyz ${1} ${a}
+	echo "${a}"
+done
+tar -zcvf xyzs.tar.gz yukawa*xyz
+rm yukawa*xyz

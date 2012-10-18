@@ -1,0 +1,8 @@
+#!/bin/bash
+touch diffusion.in
+rm diffusion.in
+for each_file in ./md.inp.*
+do
+	echo $each_file
+	cat $each_file >> diffusion.in
+done

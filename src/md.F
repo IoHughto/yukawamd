@@ -46,7 +46,7 @@
 ! Copy temporary log file to permanent one, and delete temporary.
       tend = tstart + dt*(nwgroup*nwsteps + ngroup*ntot*nind)
       if(myrank.eq.0) then
-        write(suffix,22) nint(tend/1000000.d0), nint(mod(tend,1000000.d0))
+        write(suffix,22) int(tend/1000000.d0), nint(mod(tend,1000000.d0))
    22   format(i5.5,i6.6)
         open(8,FILE='md.'//trim(suffix)//'.log', FORM='FORMATTED',STATUS='UNKNOWN')
         rewind(7)
@@ -112,7 +112,7 @@
           '  Measurement phase',/,  &
           'e   step     time            Vtot              Ttot               E              pressure',/, &
           'p   step     time            P_xx              P_xy              P_xz              P_yy              P_yz              P_zz')
-        write(suffix,22) nint(tend/1000000.d0), nint(mod(tend,1000000.d0))
+        write(suffix,22) int(tend/1000000.d0), nint(mod(tend,1000000.d0))
         open(9,FILE='md.'//trim(suffix)//'.meas',FORM='UNFORMATTED',STATUS='UNKNOWN')
       endif
       evave=0.;  ev2ave=0.

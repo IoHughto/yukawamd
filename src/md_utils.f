@@ -28,8 +28,8 @@
 
 !  Only MPI process 0 writes to the checkpoint file.
       if(myrank.eq.0) then
-        write(mdckptfile,110) nint(time/1000000.d0), nint(mod(time,1000000.d0)), '.ckpt'
-        write(mdoutfile,110) nint(time/1000000.d0), nint(mod(time,1000000.d0)), '.xv8b'
+        write(mdckptfile,110) int(time/1000000.d0), nint(mod(time,1000000.d0)), '.ckpt'
+        write(mdoutfile,110) int(time/1000000.d0), nint(mod(time,1000000.d0)), '.xv8b'
   110   format('md.',i5.5,i6.6,a)
         call write_xvb(mdoutfile,'xv8b  ',.false.,.true.)
       endif
@@ -73,10 +73,10 @@
 ! Only MPI process 0 writes to the file.
       if(myrank.eq.0) then
         if(xappend) then
-          write(mdoutfile,100) nint(tend/1000000.d0), nint(mod(tend,1000000.d0)), trim(xfiletype)
+          write(mdoutfile,100) int(tend/1000000.d0), nint(mod(tend,1000000.d0)), trim(xfiletype)
   100     format('md.traj.',i5.5,i6.6,'.',a)
         else
-          write(mdoutfile,110) nint(time/1000000.d0), nint(mod(time,1000000.d0)), trim(xfiletype)
+          write(mdoutfile,110) int(time/1000000.d0), nint(mod(time,1000000.d0)), trim(xfiletype)
   110     format('md.',i5.5,i6.6,'.',a)
         endif
         !-----------------------------------------------------------------------

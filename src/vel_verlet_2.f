@@ -1,10 +1,10 @@
 !*******************************************************************************
 !
-!    MD 6.2.0
+!    MD 6.3.0
 ! ---------------------------------------------------------------------
 !    Copyright 2011, The Trustees of Indiana University
-!    Authors:           Don Berry
-!    Last modified by:  Don Berry, 2011-Dec-29
+!    Authors:           Don Berry, Joe Hughto
+!    Last modified by:  Joe Hughto, 2012-Nov-25
 ! ---------------------------------------------------------------------
 !
 !*******************************************************************************
@@ -20,18 +20,13 @@
       use  md_globals
       use  md_comm
       implicit real(dble)(a-h,o-z)
-      integer i3,i4,i5,ix,iy,iz,inbox
+      integer i3,i4,i5,isum
       include  'perf.h'
 
       logical      do_measurements
       real(dble)   vp(3)
 
       call starttimer()   !DKB-perf (newton)
-
-      i3=0;i4=0;i5=0
-      if(deps(4).ne.XNOSTRAIN) i3=1
-      if(deps(5).ne.XNOSTRAIN) i4=2
-      if(deps(6).ne.XNOSTRAIN) i5=4
 
 ! ---------------------------------------------------------
 ! Integrate velocities and accelerations a full time step to get
@@ -45,71 +40,18 @@
          enddo
       enddo
       !$omp end do
-      if(i3+i4+i5.eq.0) then
-         !$omp do schedule(runtime)
-         do i=0,n-1
-            do k=1,3
-               if(x(k,i).lt.0.0)   x(k,i)=x(k,i)+xl(k) !periodic boundary conditions
-               if(x(k,i).gt.xl(k)) x(k,i)=x(k,i)-xl(k)
-            enddo
-         enddo
-         !$omp end do
-      else
-         sfac=0.d0
-         ix=1
-         iy=2
-         iz=3
-         select case (i3+i4+i5)
-         case(1)
-            sfac=deps(4)*(time-tstart)/2.d0
-         case(2)
-            sfac=deps(5)*(time-tstart)/2.d0
-            ix=2
-            iy=3
-            iz=1
-         case(4)
-            sfac=deps(6)*(time-tstart)/2.d0
-            ix=3
-            iy=1
-            iz=2
-         end select
-         !$omp do schedule(runtime)
-         do i=0,n-1
-            inbox=0
-            do while(inbox.eq.0)
-               inbox=1
-               if(x(ix,i).gt.xl(ix)*(1+sfac*sfac)) then
-                  x(ix,i)=x(ix,i)-xl(ix)*(1+sfac*sfac)
-                  inbox=0
-               end if
-               if(x(ix,i).lt.0.0) then
-                  x(ix,i)=x(ix,i)+xl(ix)*(1+sfac*sfac)
-                  inbox=0
-               end if
-               if(x(iy,i).lt.sfac*x(iz,i)) then
-                  x(iy,i)=x(iy,i)+xl(iy)
-                  x(iz,i)=x(iz,i)+xl(iy)*sfac
-                  inbox=0
-               end if
-               if(x(iy,i).gt.sfac*x(iz,i)+xl(iy)*(1-sfac*sfac)) then
-                  x(iy,i)=x(iy,i)-xl(iy)
-                  x(iz,i)=x(iz,i)-xl(iy)*sfac
-                  inbox=0
-               end if
-               if(x(iz,i).lt.sfac*x(iy,i)) then
-                  x(iz,i)=x(iz,i)+xl(iz)
-                  x(iy,i)=x(iy,i)+xl(iz)*sfac
-                  inbox=0
-               end if
-               if(x(iz,i).gt.sfac*x(iy,i)+xl(iz)*(1-sfac*sfac)) then
-                  x(iz,i)=x(iz,i)-xl(iz)
-                  x(iy,i)=x(iy,i)-xl(iz)*sfac
-                  inbox=0
-               end if
-            enddo
-         enddo
-         !$omp end do
-      end if
+
+! ---------------------------------------------------------
+! Check to make sure ions didn't move outside of the box.
+
+      i3=0; i4=0; i5=0
+      if(deps(4).ne.XNOSTRAIN) i3=1
+      if(deps(5).ne.XNOSTRAIN) i4=2
+      if(deps(6).ne.XNOSTRAIN) i5=4
+
+      isum=i3+i4+i5
+
+      call check_box(isum)
 
 ! ---------------------------------------------------------
 ! Save old velocities. Integrate old accelerations a full time step to

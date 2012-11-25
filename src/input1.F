@@ -1,9 +1,9 @@
 !*******************************************************************************
-!    MD 6.2.0
+!    MD 6.3.0
 ! ----------------------------------------------------------------------
 !    Copyright 2012, The Trustees of Indiana University
-!    Author:            Don Berry
-!    Last modified by:  Don Berry, 2012-Jul-13
+!    Authors:           Don Berry, Joe Hughto
+!    Last modified by:  Joe Hughto, 2012-Oct-17
 ! ----------------------------------------------------------------------
 !
 ! Read the parameter file for the simulation. Use input parameters to calculate
@@ -207,8 +207,21 @@
              '  L0                =', 2x,f17.9, ' fm'      /    &
              '  gage dimensions   =', 3(2x,f17.9), ' fm',  /    &
              '  gage aspect       =', 3(6x,f13.9)          /    &
-             '  strainrates       =')
-      do k=1,6
+             '  stretch rates     =')
+      do k=1,3
+        if(deps(k).eq.XNOSTRAIN) then
+          write(6,"(19x)",advance='no')
+          write(7,"(19x)",advance='no')
+        else
+          write(6,"(2x,es17.9)",advance='no') deps(k)
+          write(7,"(2x,es17.9)",advance='no') deps(k)
+        endif
+      enddo
+      write(6,"(' c/fm')")
+      write(7,"(' c/fm')")
+      write(6,"('  shear rates       =')",advance='no')
+      write(7,"('  shear rates       =')",advance='no')
+      do k=4,6
         if(deps(k).eq.XNOSTRAIN) then
           write(6,"(19x)",advance='no')
           write(7,"(19x)",advance='no')

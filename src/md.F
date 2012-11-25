@@ -20,6 +20,7 @@
 ! Mean, 2nd moment, and std.dev. of potential energy and pressure.
       real(dble)   evave,ev2ave,devave
       real(dble)   pave,p2ave,dp2ave
+      real(dble)   fshear(3)
 
       logical      do_measurements
 
@@ -192,11 +193,18 @@
         stretch=xl/xl0
         aspect=stretch*aspect
         rho=float(n)/(xl(1)*xl(2)*xl(3))
-        write(6,10206) xl, aspect, stretch, rho
-        write(8,10206) xl, aspect, stretch, rho
+        fshear(1)=0.d0
+        fshear(2)=0.d0
+        fshear(3)=0.d0
+        if(deps(4).ne.XNOSTRAIN) fshear(1)=deps(4)*(time-tstart)
+        if(deps(5).ne.XNOSTRAIN) fshear(2)=deps(5)*(time-tstart)
+        if(deps(6).ne.XNOSTRAIN) fshear(3)=deps(6)*(time-tstart)
+        write(6,10206) xl, aspect, stretch, fshear, rho
+        write(8,10206) xl, aspect, stretch, fshear, rho
 10206   format('  Final dimensions  =',3(2x,f17.9), ' fm', /   &
                '  Final aspect      =',3(2x,f17.9),        /   & 
                '  Final stretch     =',3(2x,f17.9),        /   &
+               '  Final shear       =',3(2x,f17.9),        /   &
                '  Final density     =',1x,es15.8, ' fm-3' )
         write(6,10210) '  Final Vtot, Ttot, E, P   = ',ev,ek,e,px
         write(8,10210) '  Final Vtot, Ttot, E, P   = ',ev,ek,e,px
